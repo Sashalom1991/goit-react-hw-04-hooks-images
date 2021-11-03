@@ -16,14 +16,14 @@ import './App.css';
 export default function App() {
   const [images, setImages] = useState([]);
   const [page, setPage] = useState(1);
-  const [imagesLenght, setImagesLenght] = useState([]);
+  const [imagesLenght, setImagesLenght] = useState();
   const [searchQuery, setSearchQuery] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
   const [showModal, setShowModal] = useState(false);
   const [urlModal, setUrlModal] = useState('');
   const [altToModal, setAltToModal] = useState('');
-  
+
   useEffect(() => {
     if (searchQuery === '') {
       return;
@@ -33,12 +33,13 @@ export default function App() {
 
   useEffect(() => {
     if (page > 2) {
-      window.scrollTo({
+       window.scrollTo({
         top: document.documentElement.scrollHeight,
         behavior: 'smooth',
       });
+      console.log(document.documentElement.scrollHeight);
     }
-  }, [page]);
+  });
 
   function fetchImages() {
     const options = { searchQuery, page };
@@ -48,16 +49,15 @@ export default function App() {
     PixabayApi.fetchArticlesWithQuery(options)
       .then(images => {
         setImages(prevState => [...prevState, ...images]);
-        setPage(page => page + 1);
-        setImagesLenght([...images]);
+        setImagesLenght(images.length);
+        setPage(page + 1);
 
         if (images.length === 0) {
           toast.error('Sorry, we didn it find anything. Try again!');
-        }
+        } 
       })
       .catch(error => {
         setError(error);
-        console.log(error);
         return;
       })
       .finally(() => {
@@ -85,34 +85,33 @@ export default function App() {
 
   return (
     <>
+    {showModal && <Loader /> && (
+        <Modal onClose={toggleModal} src={urlModal} alt={altToModal}></Modal>
+      )}
       <ToastContainer />
       <Searchbar onSubmit={handleFormSubmit} />
       {error && <CatchError />}
       <ImageGallery>
-          {images.map(({ id, tags, webformatURL, largeImageURL }) => (
-            <ImageGalleryItem
-              key={id}
-              alt={tags}
-              src={webformatURL}
-              url={largeImageURL}
-              onClick={onClickImageGalleryItem}
-            />
-          ))}
-        </ImageGallery>
+        {images.map(({ id, tags, webformatURL, largeImageURL }) => (
+          <ImageGalleryItem
+            key={id}
+            alt={tags}
+            src={webformatURL}
+            url={largeImageURL}
+            onClick={onClickImageGalleryItem}
+          />
+        ))}
+      </ImageGallery>
       {isLoading && (
         <div className="LoaderContainer">
           <Loader type="Bars" color="#00BFFF" height={80} width={80} />
         </div>
       )}
-      {!(imagesLenght.length < 12) && (
+      {(imagesLenght === 12) && (
         <div className="ButtonContainer">
           <Button onClick={fetchImages} />
         </div>
-      )}
-
-      {showModal && <Loader /> && (
-        <Modal onClose={toggleModal} src={urlModal} alt={altToModal}></Modal>
-      )}
+      )}      
     </>
   );
 }

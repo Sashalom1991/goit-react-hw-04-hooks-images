@@ -17,6 +17,7 @@
     "react-loader-spinner": "^4.0.0",
     "react-loading": "^2.0.3",
     "react-scripts": "4.0.3",
+    "react-scroll-hooks": "^0.1.1",
     "react-toastify": "^8.0.3",
     "web-vitals": "^1.1.2"
   },
