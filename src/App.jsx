@@ -39,7 +39,7 @@ export default function App() {
       });
       console.log(document.documentElement.scrollHeight);
     }
-  });
+  }, [page]);
 
   function fetchImages() {
     const options = { searchQuery, page };
